@@ -21,7 +21,34 @@ namespace Amogus.Language
 
             return null;
         }
-        
+
+        public override object? VisitIndentifierExpression(AmogusParser.IndentifierExpressionContext context)
+        {
+            var varName = context.INDENTIFIER().GetText();
+
+            if(!Variables.ContainsKey(varName))
+            {
+                throw new Exception($"Variable {varName} is not defined.");
+            }
+
+            return Variables[varName];
+        }
+
+        public override object? VisitAdditiveExpression(AmogusParser.AdditiveExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var op = context.addOp().GetText();
+
+            return op switch
+            {
+                "+" => Add(left, right),
+                //"-" => Subtract(left, right),
+                _ => throw new NotImplementedException()
+            };
+        }
+
         public override object? VisitConstant(AmogusParser.ConstantContext context)
         {
             if (context.INTEGER() is { } intConstant)
@@ -50,6 +77,81 @@ namespace Amogus.Language
             }
 
             throw new NotImplementedException();
+        }
+
+        public override object? VisitWhileBlock(AmogusParser.WhileBlockContext context)
+        {
+            Func<object?, bool> condition = context.WHILE().GetText() == "while" ? IsTrue : IsFalse;
+
+            if(condition(Visit(context.expression())))
+            {
+                do
+                {
+                    Visit(context.block());
+                } while (condition(Visit(context.expression())));
+            }
+            else
+            {
+                Visit(context.elseIfBlock());
+            }
+
+            return null;
+        }
+
+        public override object? VisitComparisonExpression(AmogusParser.ComparisonExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var op = context.compareOp().GetText();
+
+            return op switch
+            {
+                "<" => LessThan(left, right),
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        private bool LessThan(object? left, object? right)
+        {
+            if(left is int l && right is int r)
+            {
+                return l < r;
+            }
+
+            if(left is float fl && right is float fr)
+            {
+                return fl < fr;
+            }
+
+            throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
+        }
+
+        private bool IsTrue(object? value)
+        {
+            if(value is bool b)
+            {
+                return b;
+            }
+
+            throw new Exception("Value is not a boolean");
+        }
+
+        private bool IsFalse(object? value) => !IsTrue(value);
+
+        private object? Add(object? left, object? right)
+        {
+            if(left is int l && right is int r)
+            {
+                return l + r;
+            }
+
+            if (left is float lf && right is float rf)
+            {
+                return lf + rf;
+            }
+
+            throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
         }
     }
 }

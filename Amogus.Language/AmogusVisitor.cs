@@ -12,6 +12,42 @@ namespace Amogus.Language
     {
         public Dictionary<string, object?> Variables { get; } = new();
 
+        public AmogusVisitor()
+        {
+            Variables["PI"] = Math.PI;
+            Variables["E"] = Math.E;
+
+            Variables["Print"] = new Func<object?[], object?>(Print);
+        }
+
+        private object? Print(object?[] args)
+        {
+            foreach(var arg in args)
+            {
+                Console.WriteLine(arg);
+            }
+
+            return null;
+        }
+
+        public override object? VisitFunctionCall(AmogusParser.FunctionCallContext context)
+        {
+            var name = context.INDENTIFIER().GetText();
+            var args = context.expression().Select(Visit).ToArray();
+
+            if(!Variables.ContainsKey(name))
+            {
+                throw new Exception($"Function {name} is not defined");
+            }
+
+            if(Variables[name] is not Func<object?[], object?> func)
+            {
+                throw new Exception($"Variable {name} is not a function");
+            }
+
+            return func(args);
+        }
+
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {
             var varName = context.INDENTIFIER().GetText();

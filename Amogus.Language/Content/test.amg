@@ -3,5 +3,7 @@ j = i + 21;
 
 while i < j
 {
+	Print('something');
+
 	i = i + 10;
 }

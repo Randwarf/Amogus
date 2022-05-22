@@ -10,14 +10,12 @@ namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
     {
-        public Dictionary<string, object?> Variables { get; } = new();
-
         public AmogusVisitor()
         {
-            Variables["PI"] = Math.PI;
-            Variables["E"] = Math.E;
+            SharedResources.Variables["PI"] = Math.PI;
+            SharedResources.Variables["E"] = Math.E;
 
-            Variables["Print"] = new Func<object?[], object?>(Print);
+            SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
         }
 
         private object? Print(object?[] args)
@@ -35,12 +33,12 @@ namespace Amogus.Language
             var name = context.INDENTIFIER().GetText();
             var args = context.expression().Select(Visit).ToArray();
 
-            if(!Variables.ContainsKey(name))
+            if(!SharedResources.Variables.ContainsKey(name))
             {
                 throw new Exception($"Function {name} is not defined");
             }
 
-            if(Variables[name] is not Func<object?[], object?> func)
+            if(SharedResources.Variables[name] is not Func<object?[], object?> func)
             {
                 throw new Exception($"Variable {name} is not a function");
             }
@@ -53,7 +51,7 @@ namespace Amogus.Language
             var varName = context.INDENTIFIER().GetText();
             var value = Visit(context.expression());
 
-            Variables[varName] = value;
+            SharedResources.Variables[varName] = value;
 
             return null;
         }
@@ -62,12 +60,12 @@ namespace Amogus.Language
         {
             var varName = context.INDENTIFIER().GetText();
 
-            if(!Variables.ContainsKey(varName))
+            if(!SharedResources.Variables.ContainsKey(varName))
             {
                 throw new Exception($"Variable {varName} is not defined.");
             }
 
-            return Variables[varName];
+            return SharedResources.Variables[varName];
         }
 
         public override object? VisitAdditiveExpression(AmogusParser.AdditiveExpressionContext context)
@@ -197,7 +195,7 @@ namespace Amogus.Language
             throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
         }
 
-        private bool IsTrue(object? value)
+        private static bool IsTrue(object? value)
         {
             if(value is bool b)
             {
@@ -207,9 +205,9 @@ namespace Amogus.Language
             throw new Exception("Value is not a boolean");
         }
 
-        private bool IsFalse(object? value) => !IsTrue(value);
+        private static bool IsFalse(object? value) => !IsTrue(value);
 
-        private object? Add(object? left, object? right)
+        private static object? Add(object? left, object? right)
         {
             if(left is int l && right is int r)
             {
@@ -236,7 +234,8 @@ namespace Amogus.Language
                 return lf - rf;
             }
 
-            throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
+
+            throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }
     }
 }

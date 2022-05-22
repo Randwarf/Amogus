@@ -80,7 +80,7 @@ namespace Amogus.Language
             return op switch
             {
                 "+" => Add(left, right),
-                //"-" => Subtract(left, right),
+                "-" => Subtract(left, right),
                 _ => throw new NotImplementedException()
             };
         }
@@ -219,6 +219,21 @@ namespace Amogus.Language
             if (left is float lf && right is float rf)
             {
                 return lf + rf;
+            }
+
+            throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
+        }
+
+        private static object? Subtract(object? left, object? right)
+        {
+            if (left is int l && right is int r)
+            {
+                return l - r;
+            }
+
+            if (left is float lf && right is float rf)
+            {
+                return lf - rf;
             }
 
             throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");

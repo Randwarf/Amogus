@@ -144,11 +144,45 @@ namespace Amogus.Language
             return op switch
             {
                 "<" => LessThan(left, right),
+                ">" => GreaterThan(left, right),
+                "==" => AreEqual(left, right),
+                ">=" => GreaterOrEqualThan(left, right),
+                "<=" => LessOrEqualThan(left, right),
                 _ => throw new NotImplementedException()
             };
         }
 
-        private bool LessThan(object? left, object? right)
+        private static bool LessOrEqualThan(object? left, object? right)
+        {
+            return LessThan(left, right) || AreEqual(left, right);
+        }
+
+        private static bool GreaterOrEqualThan(object? left, object? right)
+        {
+            return GreaterThan(left, right) || AreEqual(left, right);
+        }
+
+        private static bool AreEqual(object? left, object? right)
+        {
+            if (left is int l && right is int r)
+            {
+                return l == r;
+            }
+
+            if (left is float fl && right is float fr)
+            {
+                return fl == fr;
+            }
+
+            throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
+        }
+
+        private static bool GreaterThan(object? left, object? right)
+        {
+            return !LessThan(left, right);
+        }
+
+        private static bool LessThan(object? left, object? right)
         {
             if(left is int l && right is int r)
             {

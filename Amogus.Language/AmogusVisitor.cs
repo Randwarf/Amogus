@@ -1,4 +1,5 @@
 ﻿using Amogus.Language.Content;
+using Amogus.Language.Types;
 using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
@@ -196,6 +197,11 @@ namespace Amogus.Language
             if (left is float lf && right is float rf)
             {
                 return func(lf, rf);
+            }
+
+            if (left is string ls && right is string rs)
+            {
+                return func((AmogusString)ls, (AmogusString)rs);
             }
 
             throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");

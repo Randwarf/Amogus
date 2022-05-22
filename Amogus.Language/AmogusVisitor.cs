@@ -6,6 +6,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+/* 
+ * TODO: Add support for data manipulation between int and float.
+ */
+
 namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
@@ -77,8 +81,8 @@ namespace Amogus.Language
 
             return op switch
             {
-                "+" => Add(left, right),
-                "-" => Subtract(left, right),
+                "+" => HandleSimpleExpression(left, right, (l, r) => l + r),
+                "-" => HandleSimpleExpression(left, right, (l, r) => l - r),
                 _ => throw new NotImplementedException()
             };
         }
@@ -86,6 +90,21 @@ namespace Amogus.Language
         public override object? VisitParenthesizedExpression(AmogusParser.ParenthesizedExpressionContext context)
         {
             return Visit(context.expression());
+        }
+
+        public override object? VisitMultiplicationExpression(AmogusParser.MultiplicationExpressionContext context)
+        {
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
+
+            var op = context.multOp().GetText();
+
+            return op switch
+            {
+                "*" => HandleSimpleExpression(left, right, (l, r) => l * r),
+                "/" => HandleSimpleExpression(left, right, (l, r) => l / r),
+                _ => throw new NotImplementedException()
+            };
         }
 
         public override object? VisitConstant(AmogusParser.ConstantContext context)
@@ -146,58 +165,13 @@ namespace Amogus.Language
 
             return op switch
             {
-                "<" => LessThan(left, right),
-                ">" => GreaterThan(left, right),
-                "==" => AreEqual(left, right),
-                ">=" => GreaterOrEqualThan(left, right),
-                "<=" => LessOrEqualThan(left, right),
+                "<" => HandleSimpleExpression(left, right, (l, r) => l < r),
+                ">" => HandleSimpleExpression(left, right, (l, r) => l > r),
+                "==" => HandleSimpleExpression(left, right, (l, r) => l == r),
+                ">=" => HandleSimpleExpression(left, right, (l, r) => l >= r),
+                "<=" => HandleSimpleExpression(left, right, (l, r) => l <= r),
                 _ => throw new NotImplementedException()
             };
-        }
-
-        private static bool LessOrEqualThan(object? left, object? right)
-        {
-            return LessThan(left, right) || AreEqual(left, right);
-        }
-
-        private static bool GreaterOrEqualThan(object? left, object? right)
-        {
-            return GreaterThan(left, right) || AreEqual(left, right);
-        }
-
-        private static bool AreEqual(object? left, object? right)
-        {
-            if (left is int l && right is int r)
-            {
-                return l == r;
-            }
-
-            if (left is float fl && right is float fr)
-            {
-                return fl == fr;
-            }
-
-            throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
-        }
-
-        private static bool GreaterThan(object? left, object? right)
-        {
-            return !LessThan(left, right);
-        }
-
-        private static bool LessThan(object? left, object? right)
-        {
-            if(left is int l && right is int r)
-            {
-                return l < r;
-            }
-
-            if(left is float fl && right is float fr)
-            {
-                return fl < fr;
-            }
-
-            throw new Exception($"Cannot compare values of types {left?.GetType()} and {right?.GetType()}");
         }
 
         private static bool IsTrue(object? value)
@@ -212,33 +186,17 @@ namespace Amogus.Language
 
         private static bool IsFalse(object? value) => !IsTrue(value);
 
-        private static object? Add(object? left, object? right)
-        {
-            if(left is int l && right is int r)
-            {
-                return l + r;
-            }
-
-            if (left is float lf && right is float rf)
-            {
-                return lf + rf;
-            }
-
-            throw new Exception($"Cannot add values of types {left?.GetType()} and {right?.GetType()}");
-        }
-
-        private static object? Subtract(object? left, object? right)
+        private static object? HandleSimpleExpression(object? left, object? right, Func<dynamic?, dynamic?, dynamic?> func)
         {
             if (left is int l && right is int r)
             {
-                return l - r;
+                return func(l, r);
             }
 
             if (left is float lf && right is float rf)
             {
-                return lf - rf;
+                return func(lf, rf);
             }
-
 
             throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
         }

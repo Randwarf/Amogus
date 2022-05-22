@@ -83,6 +83,11 @@ namespace Amogus.Language
             };
         }
 
+        public override object? VisitParenthesizedExpression(AmogusParser.ParenthesizedExpressionContext context)
+        {
+            return Visit(context.expression());
+        }
+
         public override object? VisitConstant(AmogusParser.ConstantContext context)
         {
             if (context.INTEGER() is { } intConstant)

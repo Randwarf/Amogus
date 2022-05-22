@@ -30,7 +30,7 @@ expression
 	| expression boolOp expression		#booleanExpression
 	;
 
-multOp: '*' | '/' | '%' ;
+multOp: '*' | '/';
 addOp: '+' | '-' ;
 compareOp: '==' | '!=' | '>' | '<' | '>=' | '<=' ;
 boolOp: BOOL_OPERATOR ;

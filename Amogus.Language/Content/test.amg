@@ -1,12 +1,23 @@
-﻿i = 100;
+﻿Print('abc');
+abc(a)=>
+{
+	Print('abc');
+	Print('Aš esu void tipo funkcija', a);
+}
+Print('cba');
+
+
+
+i=100;
 Print(i);
-j = i + 21;
+j=i+21;
 
 while i < j
 {
-	Print('something');
+	Print('something: ', i);
 
 	i = i + 10;
 }
 
 Print('Baigiau');
+abc();

@@ -137,6 +137,17 @@ namespace Amogus.Language
             throw new NotImplementedException();
         }
 
+        public override object? VisitFunctionBlock(AmogusParser.FunctionBlockContext context)
+        {
+            //throw new NotImplementedException();
+            Console.WriteLine("Aš iškviestas");
+            var name = context.IDENTIFIER().GetText();
+            //Console.WriteLine(context.block().GetText());
+            SharedResources.Variables[name] = "ABC";
+
+            return null;
+        }
+
         public override object? VisitWhileBlock(AmogusParser.WhileBlockContext context)
         {
             Func<object?, bool> condition = context.WHILE().GetText() == "while" ? IsTrue : IsFalse;

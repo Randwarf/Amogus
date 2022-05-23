@@ -2,7 +2,7 @@
 
 program: line* EOF;
 
-line: statement | ifBlock | whileBlock | functionBlock;
+line: functionBlock | statement | ifBlock | whileBlock;
 
 statement: (assignment|functionCall) ';';
 
@@ -18,7 +18,7 @@ assignment: IDENTIFIER '=' expression;
 
 functionBlock: IDENTIFIER'(' variables ')' '=>' block;
 
-variables: WS | IDENTIFIER',' variables | IDENTIFIER;
+variables: (' ')* | (IDENTIFIER (',' IDENTIFIER)*);
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 

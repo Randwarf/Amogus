@@ -42,6 +42,10 @@ namespace Amogus.Language
                 throw new Exception($"Function {name} is not defined");
             }
 
+            if(SharedResources.Variables[name] is functionObject funcObj){
+                return callFunction(funcObj, args);
+            }
+
             if(SharedResources.Variables[name] is not Func<object?[], object?> func)
             {
                 //callFunction(name, args);
@@ -49,6 +53,19 @@ namespace Amogus.Language
             }
 
             return func(args);
+        }
+
+        public object? callFunction(functionObject funcObj, object?[]? args)
+        {
+            if (args != null)
+            {
+                for(int i = 0; i < args.Length; i++)
+                {
+                    SharedResources.Variables[funcObj.Names[i]] = args[i];
+                }
+            }
+
+            return Visit(funcObj.body);
         }
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
@@ -140,11 +157,9 @@ namespace Amogus.Language
 
         public override object? VisitFunctionBlock(AmogusParser.FunctionBlockContext context)
         {
-            //throw new NotImplementedException();
-            //Console.WriteLine("Aš iškviestas");
             var name = context.IDENTIFIER().GetText();
-            //Console.WriteLine(context.block().GetText());
-            //SharedResources.Variables[name] = context.block();
+            var args = context.variables().GetText().Split(',');
+            SharedResources.Variables[name] = new functionObject(args, context.block());
 
             return null;
         }
@@ -163,6 +178,25 @@ namespace Amogus.Language
             else
             {
                 Visit(context.elseIfBlock());
+            }
+
+            return null;
+        }
+
+        public override object? VisitIfBlock(AmogusParser.IfBlockContext context)
+        {
+            Func<object?, bool> condition = context.IF().GetText() == "if" ? IsTrue : IsFalse;
+
+            if(condition(Visit(context.expression())))
+            {
+                Visit(context.block());
+            }
+            else
+            {
+                if(context.elseIfBlock() != null)
+                {
+                    Visit(context.elseIfBlock());
+                }
             }
 
             return null;
@@ -210,7 +244,20 @@ namespace Amogus.Language
                 return func(lf, rf);
             }
 
-            throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
+            throw new Exception($"Cannot manipulate values of types {left?.GetType()} and {right?.GetType()}");
+        }
+    }
+
+    public class functionObject
+    {
+        public string[] Names;
+        public AmogusParser.BlockContext body;
+
+        public functionObject(string[] names, AmogusParser.BlockContext body){
+            Names = new string[names.Length];
+            names.CopyTo(Names, 0);
+
+            this.body = body;
         }
     }
 }

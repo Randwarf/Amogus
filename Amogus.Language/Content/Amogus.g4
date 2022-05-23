@@ -2,15 +2,19 @@
 
 program: line* EOF;
 
-line: functionBlock | statement | ifBlock | whileBlock;
+line: functionBlock | statement | ifBlock | whileBlock | EXIT;
+
+EXIT: 'EXIT;' | 'RETURN;';
 
 statement: (assignment|functionCall) ';';
 
-ifBlock: 'if' expression block ('else' elseIfBlock)?;
+ifBlock: IF expression block ('else' elseIfBlock)?;
 
 elseIfBlock: block | ifBlock;
 
 whileBlock: WHILE expression block ('else' elseIfBlock);
+
+IF: 'if';
 
 WHILE: 'while' | 'until';
 
@@ -18,7 +22,7 @@ assignment: IDENTIFIER '=' expression;
 
 functionBlock: IDENTIFIER'(' variables ')' '=>' block;
 
-variables: (' ')* | (IDENTIFIER (',' IDENTIFIER)*);
+variables: (IDENTIFIER (',' IDENTIFIER)*);
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 

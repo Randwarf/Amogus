@@ -1,5 +1,16 @@
 ﻿Print('Fibonaci');
 
+fib(a,b)=>
+{
+	d=a+b;
+	if d>100
+	{
+		EXIT;
+	}
+	Print(d);
+	fib(b,d);
+}
+
 a=1;
 b=1;
 c=a+b;
@@ -10,3 +21,5 @@ while c<100
 	b=c;
 	c=a+b;
 }
+
+fib(1,1);

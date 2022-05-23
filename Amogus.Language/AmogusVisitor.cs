@@ -25,7 +25,7 @@ namespace Amogus.Language
             SharedResources.Variables["E"] = Math.E;
             SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
             SharedResources.Variables["Write"] = new Func<object?[], object?, object?>(Write);
-            SharedResources.Variables["Read"] = new Func<string, object?>(Read);
+            SharedResources.Variables["Read"] = new Func<object?, object?>(Read);
         }
 
 
@@ -49,16 +49,16 @@ namespace Amogus.Language
                     return callFunction(funcObj, args);
                 }
 
-                if(SharedResources.Variables[name] is Func<object?[], object?> func)
+                if(SharedResources.Variables[name] is Func<object?[], object?> func && name != "Read")
                 {
                     return func(args);
                 }
 
                 if (SharedResources.Variables[name] is Func<object?[], object?, object?> func2)
                 {
-                    if(args.Length < 2)
+                    if(args.Length < 2 || args.Length > 3)
                     {
-                        throw new NotImplementedException();
+                        throw new Exception("Wrong parameter count");
                     }
 
                     var pathArg = args[args.Length - 1];
@@ -70,6 +70,16 @@ namespace Amogus.Language
                     }
 
                     return func2(otherArgs, pathArg);
+                }
+
+                if (SharedResources.Variables[name] is Func<object?, object?> func3)
+                {
+                    if(args.Length != 1)
+                    {
+                        throw new Exception("Wrong parameter count");
+                    }
+
+                    return func3(args[0]);
                 }
             }
 
@@ -333,9 +343,14 @@ namespace Amogus.Language
             return null;
         }
 
-        private object? Read(string path)
+        private object? Read(object? path)
         {
-            return File.ReadAllText(path);
+            if(path == null)
+            {
+                return new Exception("Unable to read from path that was null");
+            }
+
+            return File.ReadAllText((string)path);
         }
 
         private object? Write(object?[] args, object? path)

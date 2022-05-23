@@ -18,13 +18,13 @@ assignment: IDENTIFIER '=' expression;
 
 functionBlock: IDENTIFIER'(' variables ')' '=>' block;
 
-variables: '' | IDENTIFIER',' variables | IDENTIFIER;
+variables: WS | IDENTIFIER',' variables | IDENTIFIER;
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 
 expression
 	: constant							#constantExpression
-	| IDENTIFIER						#IDENTIFIERExpression
+	| IDENTIFIER						#identifierExpression
 	| functionCall						#functionCallExpression
 	| '(' expression ')'				#parenthesizedExpression
 	| '!' expression					#notExpression

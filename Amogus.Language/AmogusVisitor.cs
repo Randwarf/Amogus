@@ -11,8 +11,6 @@ namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
     {
-        public readonly List<object?> SystemOut = new List<object?>();
-
         public Stack<Dictionary<string, object?>> scope;
 
         public AmogusVisitor()
@@ -28,12 +26,14 @@ namespace Amogus.Language
             SharedResources.Variables["Read"] = new Func<object?, object?>(Read);
         }
 
-
         public override object? VisitProgram(AmogusParser.ProgramContext context)
         {
             base.VisitProgram(context);
 
-            return SystemOut;
+            return new Log
+            {
+                SystemOut = LogResource.SystemOut
+            };
         }
 
         public override object? VisitFunctionCall(AmogusParser.FunctionCallContext context)
@@ -333,11 +333,15 @@ namespace Amogus.Language
         {
             foreach (var arg in args)
             {
-                SystemOut.Add(arg);
+                var output = (string)(arg ?? string.Empty);
+
+                LogResource.SystemOut.Add(output);
+
                 Console.Write(arg);
             }
 
-            SystemOut.Add("\n");
+            LogResource.SystemOut.Add("\n");
+
             Console.Write("\n");
 
             return null;

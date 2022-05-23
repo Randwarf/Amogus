@@ -11,16 +11,8 @@ namespace Amogus.Language
             var fileName = "Content\\test.amg";
             var fileContents = File.ReadAllText(fileName);
 
-            var inputStream = new AntlrInputStream(fileContents);
-            var amogusLexer = new AmogusLexer(inputStream);
-            var commonTokenStream = new CommonTokenStream(amogusLexer);
-            var amogusParser = new AmogusParser(commonTokenStream);
-            var amogusContext = amogusParser.program();
-            var visitor = new AmogusVisitor();
-
-            visitor.Visit(amogusContext);
+            Execute(fileContents);
         }
-
         public static object? Execute(string programText)
         {
             var inputStream = new AntlrInputStream(programText);
@@ -31,9 +23,7 @@ namespace Amogus.Language
             var amogusContext = amogusParser.program();
             var visitor = new AmogusVisitor();
 
-            var x = visitor.Visit(amogusContext);
-
-            return x;
+            return visitor.Visit(amogusContext);
         }
     }
 }

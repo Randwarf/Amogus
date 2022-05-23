@@ -11,7 +11,7 @@ fib(a,b)=>
 	fib(b,c);
 }
 
-kitoksC(a)=>
+kitoksC()=>
 {
 	c=10;
 	Print('kitoks c:', c);
@@ -20,6 +20,11 @@ kitoksC(a)=>
 grazinantis(a)=>
 {
 	return 10;
+}
+
+beParametru()=>
+{
+	return 5;
 }
 
 if 1>10
@@ -45,7 +50,7 @@ while c<100
 fib(1,1);
 
 Print('C:', c);
-kitoksC(6);
+kitoksC();
 Print('C:', c);
 
 c=grazinantis(6);
@@ -55,4 +60,7 @@ c=15;
 d=grazinantis;
 c=d(6);
 Print(c);
+
+d=beParametru();
+Print(d);
 

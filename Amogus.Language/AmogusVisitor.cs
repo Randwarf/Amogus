@@ -83,17 +83,25 @@ namespace Amogus.Language
                     scope.Peek()[funcObj.Names[i]] = args[i];
                 }
             }
-            var result = Visit(funcObj.body);
-            scope.Pop();
-
-            return result;
+            try
+            {
+                var result = Visit(funcObj.body);
+            }
+            catch(ReturnException e)
+            {
+                //TODO: process return value
+            }
+            finally
+            {
+                scope.Pop();   
+            }
+            return null;
         }
 
-        /*
-        public override object? VisitReturn(AmogusParser.AssignmentContext context)
+        public override object? VisitReturn(AmogusParser.ReturnContext context)
         {
-            
-        }*/
+            throw new ReturnException(null);
+        }
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {
@@ -292,6 +300,14 @@ namespace Amogus.Language
             this.body = body;
 
             this.name = name;
+        }
+    }
+
+    public class ReturnException : Exception
+    {
+        public object? returnVar;
+        public ReturnException(object? var){
+            returnVar = var;
         }
     }
 }

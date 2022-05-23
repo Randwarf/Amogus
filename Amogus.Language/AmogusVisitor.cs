@@ -24,7 +24,7 @@ namespace Amogus.Language
             SharedResources.Variables["PI"] = Math.PI;
             SharedResources.Variables["E"] = Math.E;
             SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
-            SharedResources.Variables["Write"] = new Func<object?[], string, object?>(Write);
+            SharedResources.Variables["Write"] = new Func<object?[], object?, object?>(Write);
             SharedResources.Variables["Read"] = new Func<string, object?>(Read);
         }
 
@@ -48,9 +48,28 @@ namespace Amogus.Language
                 {
                     return callFunction(funcObj, args);
                 }
+
                 if(SharedResources.Variables[name] is Func<object?[], object?> func)
                 {
                     return func(args);
+                }
+
+                if (SharedResources.Variables[name] is Func<object?[], object?, object?> func2)
+                {
+                    if(args.Length < 2)
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                    var pathArg = args[args.Length - 1];
+                    var otherArgs = new object?[args.Length - 1];
+
+                    for(var i = 0; i < otherArgs.Length; i++)
+                    {
+                        otherArgs[i] = args[i];
+                    }
+
+                    return func2(otherArgs, pathArg);
                 }
             }
 
@@ -319,7 +338,7 @@ namespace Amogus.Language
             return File.ReadAllText(path);
         }
 
-        private object? Write(object?[] args, string path)
+        private object? Write(object?[] args, object? path)
         {
             var s = string.Empty;
 
@@ -328,7 +347,12 @@ namespace Amogus.Language
                 s += arg?.ToString();
             }
 
-            File.WriteAllText(path, s);
+            if(path == null)
+            {
+                throw new Exception("Unable to write to file path was null");
+            }
+
+            File.WriteAllText((string)path, s);
 
             return null;
         }

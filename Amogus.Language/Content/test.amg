@@ -71,4 +71,3 @@ naujas()=>
 naujas();
 x=naujas;
 x();
-

@@ -75,6 +75,18 @@ namespace Amogus.Language
 
         public object? callFunction(functionObject funcObj, object?[]? args)
         {
+            if(args is not null)
+            {
+                if (args.Length != funcObj.Names.Length)
+                {
+                    throw new ArgumentException("Incorrect number of arguments, expected "+ funcObj.Names.Length);
+                }
+            }
+            else if (funcObj.Names.Length != 0)
+            {
+                throw new ArgumentException("Incorrect number of arguments, expected "+ funcObj.Names.Length);
+            }
+
             scope.Push(new Dictionary<string, object?>());
             scope.Peek()[funcObj.name] = funcObj;
             if (args != null)
@@ -307,6 +319,10 @@ namespace Amogus.Language
         public functionObject(string[] names, AmogusParser.BlockContext body, string name){
             Names = new string[names.Length];
             names.CopyTo(Names, 0);
+            if(Names.Length == 1 && String.IsNullOrWhiteSpace(Names[0]))
+            {
+                Names=new string[0];
+            }
 
             this.body = body;
 

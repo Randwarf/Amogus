@@ -15,14 +15,15 @@ kitoksC()=>
 {
 	c=10;
 	Print('kitoks c:', c);
+	return 0;
 }
 
-grazinantis(a)=>
+grazinantis()=>
 {
 	return 10;
 }
 
-beParametru()=>
+beParametru( )=>
 {
 	return 5;
 }
@@ -53,14 +54,21 @@ Print('C:', c);
 kitoksC();
 Print('C:', c);
 
-c=grazinantis(6);
-Print(c);
+c=grazinantis();
+Print('Su return: ', c);
 c=15;
 
 d=grazinantis;
-c=d(6);
-Print(c);
+c=d();
+Print('Su unikalia savybe (funkcijos interpretuojamos kaip kintamieji): ', c);
 
-d=beParametru();
-Print(d);
+Print('Be parametru: ', beParametru());
+
+naujas()=>
+{
+	Print('Hello');
+}
+naujas();
+x=naujas;
+x();
 

@@ -31,8 +31,9 @@ namespace Amogus.Language
         {
             foreach(var arg in args)
             {
-                Console.WriteLine(arg);
+                Console.Write(arg);
             }
+            Console.Write("\n");
 
             return null;
         }

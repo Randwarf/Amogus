@@ -34,7 +34,7 @@ namespace Amogus.Language
 
         public override object? VisitFunctionCall(AmogusParser.FunctionCallContext context)
         {
-            var name = context.INDENTIFIER().GetText();
+            var name = context.IDENTIFIER().GetText();
             var args = context.expression().Select(Visit).ToArray();
 
             if(!SharedResources.Variables.ContainsKey(name))
@@ -52,7 +52,7 @@ namespace Amogus.Language
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {
-            var varName = context.INDENTIFIER().GetText();
+            var varName = context.IDENTIFIER().GetText();
             var value = Visit(context.expression());
 
             SharedResources.Variables[varName] = value;
@@ -60,9 +60,9 @@ namespace Amogus.Language
             return null;
         }
 
-        public override object? VisitIndentifierExpression(AmogusParser.IndentifierExpressionContext context)
+        public override object? VisitIdentifierExpression(AmogusParser.IdentifierExpressionContext context)
         {
-            var varName = context.INDENTIFIER().GetText();
+            var varName = context.IDENTIFIER().GetText();
 
             if(!SharedResources.Variables.ContainsKey(varName))
             {

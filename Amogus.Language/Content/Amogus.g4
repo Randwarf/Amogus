@@ -45,7 +45,7 @@ constant: INTEGER | FLOAT | STRING | BOOL | NULL;
 
 INTEGER: [0-9]+ ;
 FLOAT: [0-9]+ '.' [0-9]+ ;
-STRING: ('*' ~'"' * '"') | ('\'' ~'\''* '\'') ;
+STRING: ('\'' ~'\''* '\'') ;
 NULL: 'null' ;
 BOOL: 'true' | 'false' ;
 

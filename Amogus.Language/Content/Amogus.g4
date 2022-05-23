@@ -2,7 +2,7 @@
 
 program: line* EOF;
 
-line: statement | ifBlock | whileBlock;
+line: statement | ifBlock | whileBlock | functionBlock;
 
 statement: (assignment|functionCall) ';';
 
@@ -14,13 +14,17 @@ whileBlock: WHILE expression block ('else' elseIfBlock);
 
 WHILE: 'while' | 'until';
 
-assignment: INDENTIFIER '=' expression;
+assignment: IDENTIFIER '=' expression;
 
-functionCall: INDENTIFIER '(' (expression (',' expression)*) ')';
+functionBlock: IDENTIFIER'(' variables ')' '=>' block;
+
+variables: '' | IDENTIFIER',' variables | IDENTIFIER;
+
+functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 
 expression
 	: constant							#constantExpression
-	| INDENTIFIER						#indentifierExpression
+	| IDENTIFIER						#IDENTIFIERExpression
 	| functionCall						#functionCallExpression
 	| '(' expression ')'				#parenthesizedExpression
 	| '!' expression					#notExpression
@@ -48,4 +52,4 @@ BOOL: 'true' | 'false' ;
 block: '{' line* '}';
 
 WS: [ \t\r\n] -> skip;
-INDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

@@ -2,25 +2,35 @@
 
 program: line* EOF;
 
-line: statement | ifBlock | whileBlock;
+line: functionBlock | statement | ifBlock | whileBlock;
 
-statement: (assignment|functionCall) ';';
+statement: (assignment|functionCall|return|exit) ';';
 
-ifBlock: 'if' expression block ('else' elseIfBlock)?;
+return: 'return' expression;
+
+exit: 'exit';
+
+ifBlock: IF expression block ('else' elseIfBlock)?;
 
 elseIfBlock: block | ifBlock;
 
 whileBlock: WHILE expression block ('else' elseIfBlock);
 
+IF: 'if';
+
 WHILE: 'while' | 'until';
 
-assignment: INDENTIFIER '=' expression;
+assignment: IDENTIFIER '=' expression;
 
-functionCall: INDENTIFIER '(' (expression (',' expression)*) ')';
+functionBlock: IDENTIFIER'(' variables ')' '=>' block;
+
+variables: (IDENTIFIER (',' IDENTIFIER)*);
+
+functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 
 expression
 	: constant							#constantExpression
-	| INDENTIFIER						#indentifierExpression
+	| IDENTIFIER						#identifierExpression
 	| functionCall						#functionCallExpression
 	| '(' expression ')'				#parenthesizedExpression
 	| '!' expression					#notExpression
@@ -41,11 +51,11 @@ constant: INTEGER | FLOAT | STRING | BOOL | NULL;
 
 INTEGER: [0-9]+ ;
 FLOAT: [0-9]+ '.' [0-9]+ ;
-STRING: ('*' ~'"' * '"') | ('\'' ~'\''* '\'') ;
+STRING: ('\'' ~'\''* '\'') ;
 NULL: 'null' ;
 BOOL: 'true' | 'false' ;
 
 block: '{' line* '}';
 
 WS: [ \t\r\n] -> skip;
-INDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;
+IDENTIFIER: [a-zA-Z_][a-zA-Z0-9_]*;

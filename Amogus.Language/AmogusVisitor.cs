@@ -15,11 +15,16 @@ namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
     {
+        public Stack<Dictionary<string, object?>> scope;
+
         public AmogusVisitor()
         {
+            scope = new Stack<Dictionary<string, object?>>();
+            Dictionary<string, object?> obj = new Dictionary<string, object?>();
+            scope.Push(obj);
+
             SharedResources.Variables["PI"] = Math.PI;
             SharedResources.Variables["E"] = Math.E;
-
             SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
         }
 
@@ -27,50 +32,107 @@ namespace Amogus.Language
         {
             foreach(var arg in args)
             {
-                Console.WriteLine(arg);
+                Console.Write(arg);
             }
+            Console.Write("\n");
 
             return null;
         }
 
         public override object? VisitFunctionCall(AmogusParser.FunctionCallContext context)
         {
-            var name = context.INDENTIFIER().GetText();
+            var name = context.IDENTIFIER().GetText();
             var args = context.expression().Select(Visit).ToArray();
 
-            if(!SharedResources.Variables.ContainsKey(name))
+            //if global
+            if(SharedResources.Variables.ContainsKey(name))
+            {
+                if(SharedResources.Variables[name] is functionObject funcObj)
+                {
+                    return callFunction(funcObj, args);
+                }
+                if(SharedResources.Variables[name] is Func<object?[], object?> func)
+                {
+                    return func(args);
+                }
+            }
+
+            //if current scope
+            var currentScope = scope.Peek();
+
+            if(!currentScope.ContainsKey(name))
             {
                 throw new Exception($"Function {name} is not defined");
             }
 
-            if(SharedResources.Variables[name] is not Func<object?[], object?> func)
+            if(currentScope[name] is functionObject funcO)
             {
-                throw new Exception($"Variable {name} is not a function");
+                return callFunction(funcO, args);
             }
-
-            return func(args);
-        }
-
-        public override object? VisitAssignment(AmogusParser.AssignmentContext context)
-        {
-            var varName = context.INDENTIFIER().GetText();
-            var value = Visit(context.expression());
-
-            SharedResources.Variables[varName] = value;
 
             return null;
         }
 
-        public override object? VisitIndentifierExpression(AmogusParser.IndentifierExpressionContext context)
+        public object? callFunction(functionObject funcObj, object?[]? args)
         {
-            var varName = context.INDENTIFIER().GetText();
-
-            if(!SharedResources.Variables.ContainsKey(varName))
+            scope.Push(new Dictionary<string, object?>());
+            scope.Peek()[funcObj.name] = funcObj;
+            if (args != null)
             {
-                throw new Exception($"Variable {varName} is not defined.");
+                for(int i = 0; i < args.Length; i++)
+                {
+                    scope.Peek()[funcObj.Names[i]] = args[i];
+                }
+            }
+            try
+            {
+                var result = Visit(funcObj.body);
+            }
+            catch(ReturnException e)
+            {
+                scope.Pop();   
+                return e.returnVar;
+            }
+            scope.Pop();   
+            return null;
+        }
+
+        public override object? VisitReturn(AmogusParser.ReturnContext context)
+        {
+            var value = Visit(context.expression());
+            throw new ReturnException(value);
+        }
+
+        /*public override object? VisitExit(AmogusParser.ReturnContext context)
+        {
+            throw new ReturnException(null);
+        }*/
+        
+
+        public override object? VisitAssignment(AmogusParser.AssignmentContext context)
+        {
+            var varName = context.IDENTIFIER().GetText();
+            var value = Visit(context.expression());
+
+            scope.Peek()[varName] = value;
+
+            return null;
+        }
+
+        public override object? VisitIdentifierExpression(AmogusParser.IdentifierExpressionContext context)
+        {
+            var varName = context.IDENTIFIER().GetText();
+
+            if(SharedResources.Variables.ContainsKey(varName))
+            {
+                return SharedResources.Variables[varName];
+            }
+            if(scope.Peek().ContainsKey(varName))
+            {
+                return scope.Peek()[varName];
             }
 
-            return SharedResources.Variables[varName];
+            throw new Exception($"Variable {varName} is not defined.");
         }
 
         public override object? VisitAdditiveExpression(AmogusParser.AdditiveExpressionContext context)
@@ -138,6 +200,15 @@ namespace Amogus.Language
             throw new NotImplementedException();
         }
 
+        public override object? VisitFunctionBlock(AmogusParser.FunctionBlockContext context)
+        {
+            var name = context.IDENTIFIER().GetText();
+            var args = context.variables().GetText().Split(',');
+            SharedResources.Variables[name] = new functionObject(args, context.block(), name);
+
+            return null;
+        }
+
         public override object? VisitWhileBlock(AmogusParser.WhileBlockContext context)
         {
             Func<object?, bool> condition = context.WHILE().GetText() == "while" ? IsTrue : IsFalse;
@@ -152,6 +223,25 @@ namespace Amogus.Language
             else
             {
                 Visit(context.elseIfBlock());
+            }
+
+            return null;
+        }
+
+        public override object? VisitIfBlock(AmogusParser.IfBlockContext context)
+        {
+            Func<object?, bool> condition = context.IF().GetText() == "if" ? IsTrue : IsFalse;
+
+            if(condition(Visit(context.expression())))
+            {
+                Visit(context.block());
+            }
+            else
+            {
+                if(context.elseIfBlock() != null)
+                {
+                    Visit(context.elseIfBlock());
+                }
             }
 
             return null;
@@ -204,7 +294,31 @@ namespace Amogus.Language
                 return func((AmogusString)ls, (AmogusString)rs);
             }
 
-            throw new Exception($"Cannot subtract values of types {left?.GetType()} and {right?.GetType()}");
+            throw new Exception($"Cannot manipulate values of types {left?.GetType()} and {right?.GetType()}");
+        }
+    }
+
+    public class functionObject
+    {
+        public string name;
+        public string[] Names;
+        public AmogusParser.BlockContext body;
+
+        public functionObject(string[] names, AmogusParser.BlockContext body, string name){
+            Names = new string[names.Length];
+            names.CopyTo(Names, 0);
+
+            this.body = body;
+
+            this.name = name;
+        }
+    }
+
+    public class ReturnException : Exception
+    {
+        public object? returnVar;
+        public ReturnException(object? var){
+            returnVar = var;
         }
     }
 }

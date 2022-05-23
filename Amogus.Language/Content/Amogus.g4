@@ -24,7 +24,7 @@ assignment: IDENTIFIER '=' expression;
 
 functionBlock: IDENTIFIER'(' variables ')' '=>' block;
 
-variables: (IDENTIFIER (',' IDENTIFIER)*);
+variables: ' '*|(IDENTIFIER (',' IDENTIFIER)*);
 
 functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
 

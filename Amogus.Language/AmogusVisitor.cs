@@ -44,6 +44,7 @@ namespace Amogus.Language
 
             if(SharedResources.Variables[name] is not Func<object?[], object?> func)
             {
+                //callFunction(name, args);
                 throw new Exception($"Variable {name} is not a function");
             }
 
@@ -140,10 +141,10 @@ namespace Amogus.Language
         public override object? VisitFunctionBlock(AmogusParser.FunctionBlockContext context)
         {
             //throw new NotImplementedException();
-            Console.WriteLine("Aš iškviestas");
+            //Console.WriteLine("Aš iškviestas");
             var name = context.IDENTIFIER().GetText();
             //Console.WriteLine(context.block().GetText());
-            SharedResources.Variables[name] = "ABC";
+            //SharedResources.Variables[name] = context.block();
 
             return null;
         }

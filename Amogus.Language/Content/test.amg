@@ -1,23 +1,12 @@
-﻿Print('abc');
-abc(a)=>
+﻿Print('Fibonaci');
+
+a=1;
+b=1;
+c=a+b;
+while c<100
 {
-	Print('abc');
-	Print('Aš esu void tipo funkcija', a);
+	Print(c);
+	a=b;
+	b=c;
+	c=a+b;
 }
-Print('cba');
-
-
-
-i=100;
-Print(i);
-j=i+21;
-
-while i < j
-{
-	Print('something: ', i);
-
-	i = i + 10;
-}
-
-Print('Baigiau');
-abc();

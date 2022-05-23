@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Amogus.Language", "Amogus.Language\Amogus.Language.csproj", "{359EB834-8A5D-4D2F-96FF-36164880C9F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amogus.Language.Tests", "Amogus.Language.IntegrationTests\Amogus.Language.Tests.csproj", "{EB06AFEB-5AF1-4FEB-AFDC-07FC5CEA3E79}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{359EB834-8A5D-4D2F-96FF-36164880C9F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{359EB834-8A5D-4D2F-96FF-36164880C9F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{359EB834-8A5D-4D2F-96FF-36164880C9F9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB06AFEB-5AF1-4FEB-AFDC-07FC5CEA3E79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB06AFEB-5AF1-4FEB-AFDC-07FC5CEA3E79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB06AFEB-5AF1-4FEB-AFDC-07FC5CEA3E79}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB06AFEB-5AF1-4FEB-AFDC-07FC5CEA3E79}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

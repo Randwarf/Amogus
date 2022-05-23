@@ -5,7 +5,7 @@ fib(a,b)=>
 	c=a+b;
 	if c>100
 	{
-		RETURN;
+		return 0;
 	}
 	Print(c);
 	fib(b,c);
@@ -15,6 +15,11 @@ kitoksC(a)=>
 {
 	c=10;
 	Print('kitoks c:', c);
+}
+
+grazinantis(a)=>
+{
+	return 10;
 }
 
 if 1>10
@@ -42,4 +47,12 @@ fib(1,1);
 Print('C:', c);
 kitoksC(6);
 Print('C:', c);
+
+c=grazinantis(6);
+Print(c);
+c=15;
+
+d=grazinantis;
+c=d(6);
+Print(c);
 

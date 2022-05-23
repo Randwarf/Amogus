@@ -64,7 +64,7 @@ namespace Amogus.Language
                 throw new Exception($"Function {name} is not defined");
             }
 
-            if(SharedResources.Variables[name] is functionObject funcO)
+            if(currentScope[name] is functionObject funcO)
             {
                 return callFunction(funcO, args);
             }
@@ -89,19 +89,24 @@ namespace Amogus.Language
             }
             catch(ReturnException e)
             {
-                //TODO: process return value
-            }
-            finally
-            {
                 scope.Pop();   
+                return e.returnVar;
             }
+            scope.Pop();   
             return null;
         }
 
         public override object? VisitReturn(AmogusParser.ReturnContext context)
         {
-            throw new ReturnException(null);
+            var value = Visit(context.expression());
+            throw new ReturnException(value);
         }
+
+        /*public override object? VisitExit(AmogusParser.ReturnContext context)
+        {
+            throw new ReturnException(null);
+        }*/
+        
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {

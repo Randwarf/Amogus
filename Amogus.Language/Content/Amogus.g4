@@ -4,9 +4,11 @@ program: line* EOF;
 
 line: functionBlock | statement | ifBlock | whileBlock;
 
-statement: (assignment|functionCall|return) ';';
+statement: (assignment|functionCall|return|exit) ';';
 
-return: 'RETURN';
+return: 'return' expression;
+
+exit: 'exit';
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
 

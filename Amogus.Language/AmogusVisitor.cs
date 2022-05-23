@@ -1,20 +1,18 @@
 ﻿using Amogus.Language.Content;
+using Amogus.Language.Resources;
 using Amogus.Language.Types;
 using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-/* 
- * TODO: Add support for data manipulation between int and float.
- */
 
 namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
     {
+        public readonly List<object?> SystemOut = new List<object?>();
+
         public Stack<Dictionary<string, object?>> scope;
 
         public AmogusVisitor()
@@ -26,17 +24,16 @@ namespace Amogus.Language
             SharedResources.Variables["PI"] = Math.PI;
             SharedResources.Variables["E"] = Math.E;
             SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
+            SharedResources.Variables["Write"] = new Func<object?[], string, object?>(Write);
+            SharedResources.Variables["Read"] = new Func<string, object?>(Read);
         }
 
-        private object? Print(object?[] args)
-        {
-            foreach(var arg in args)
-            {
-                Console.Write(arg);
-            }
-            Console.Write("\n");
 
-            return null;
+        public override object? VisitProgram(AmogusParser.ProgramContext context)
+        {
+            base.VisitProgram(context);
+
+            return SystemOut;
         }
 
         public override object? VisitFunctionCall(AmogusParser.FunctionCallContext context)
@@ -114,12 +111,6 @@ namespace Amogus.Language
             var value = Visit(context.expression());
             throw new ReturnException(value);
         }
-
-        /*public override object? VisitExit(AmogusParser.ReturnContext context)
-        {
-            throw new ReturnException(null);
-        }*/
-        
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {
@@ -307,6 +298,39 @@ namespace Amogus.Language
             }
 
             throw new Exception($"Cannot manipulate values of types {left?.GetType()} and {right?.GetType()}");
+        }
+
+        private object? Print(object?[] args)
+        {
+            foreach (var arg in args)
+            {
+                SystemOut.Add(arg);
+                Console.Write(arg);
+            }
+
+            SystemOut.Add("\n");
+            Console.Write("\n");
+
+            return null;
+        }
+
+        private object? Read(string path)
+        {
+            return File.ReadAllText(path);
+        }
+
+        private object? Write(object?[] args, string path)
+        {
+            var s = string.Empty;
+
+            foreach (var arg in args)
+            {
+                s += arg?.ToString();
+            }
+
+            File.WriteAllText(path, s);
+
+            return null;
         }
     }
 

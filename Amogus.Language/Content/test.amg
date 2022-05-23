@@ -1,73 +1,19 @@
-﻿Print('Fibonaci');
-
-fib(a,b)=>
+﻿f()=>
 {
-	c=a+b;
-	if c>100
-	{
-		return 0;
-	}
-	Print(c);
-	fib(b,c);
+	Print('Hello1');	
 }
 
-kitoksC()=>
+f2()=>
 {
-	c=10;
-	Print('kitoks c:', c);
-	return 0;
+	Print('Hello2');
 }
 
-grazinantis()=>
-{
-	return 10;
-}
-
-beParametru( )=>
-{
-	return 5;
-}
-
-if 1>10
-{
-	Print('klaida');
-}
-else if 10>1
-{
-	Print('aaa');
-}
-
-a=1;
-b=1;
-c=a+b;
-while c<100
-{
-	Print(c);
-	a=b;
-	b=c;
-	c=a+b;
-}
-
-fib(1,1);
-
-Print('C:', c);
-kitoksC();
-Print('C:', c);
-
-c=grazinantis();
-Print('Su return: ', c);
-c=15;
-
-d=grazinantis;
-c=d();
-Print('Su unikalia savybe (funkcijos interpretuojamos kaip kintamieji): ', c);
-
-Print('Be parametru: ', beParametru());
-
-naujas()=>
-{
-	Print('Hello');
-}
-naujas();
-x=naujas;
+x=f;
+f();
+y=f;
 x();
+z=f;
+z();
+z=f2();
+f2();
+z();

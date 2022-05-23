@@ -14,11 +14,16 @@ namespace Amogus.Language
 {
     public class AmogusVisitor : AmogusBaseVisitor<object?>
     {
+        public Stack<Dictionary<string, object?>> scope;
+
         public AmogusVisitor()
         {
+            scope = new Stack<Dictionary<string, object?>>();
+            Dictionary<string, object?> obj = new Dictionary<string, object?>();
+            scope.Push(obj);
+
             SharedResources.Variables["PI"] = Math.PI;
             SharedResources.Variables["E"] = Math.E;
-
             SharedResources.Variables["Print"] = new Func<object?[], object?>(Print);
         }
 
@@ -37,43 +42,64 @@ namespace Amogus.Language
             var name = context.IDENTIFIER().GetText();
             var args = context.expression().Select(Visit).ToArray();
 
-            if(!SharedResources.Variables.ContainsKey(name))
+            //if global
+            if(SharedResources.Variables.ContainsKey(name))
+            {
+                if(SharedResources.Variables[name] is functionObject funcObj)
+                {
+                    return callFunction(funcObj, args);
+                }
+                if(SharedResources.Variables[name] is Func<object?[], object?> func)
+                {
+                    return func(args);
+                }
+            }
+
+            //if current scope
+            var currentScope = scope.Peek();
+
+            if(!currentScope.ContainsKey(name))
             {
                 throw new Exception($"Function {name} is not defined");
             }
 
-            if(SharedResources.Variables[name] is functionObject funcObj){
-                return callFunction(funcObj, args);
-            }
-
-            if(SharedResources.Variables[name] is not Func<object?[], object?> func)
+            if(SharedResources.Variables[name] is functionObject funcO)
             {
-                //callFunction(name, args);
-                throw new Exception($"Variable {name} is not a function");
+                return callFunction(funcO, args);
             }
 
-            return func(args);
+            return null;
         }
 
         public object? callFunction(functionObject funcObj, object?[]? args)
         {
+            scope.Push(new Dictionary<string, object?>());
+            scope.Peek()[funcObj.name] = funcObj;
             if (args != null)
             {
                 for(int i = 0; i < args.Length; i++)
                 {
-                    SharedResources.Variables[funcObj.Names[i]] = args[i];
+                    scope.Peek()[funcObj.Names[i]] = args[i];
                 }
             }
+            var result = Visit(funcObj.body);
+            scope.Pop();
 
-            return Visit(funcObj.body);
+            return result;
         }
+
+        /*
+        public override object? VisitReturn(AmogusParser.AssignmentContext context)
+        {
+            
+        }*/
 
         public override object? VisitAssignment(AmogusParser.AssignmentContext context)
         {
             var varName = context.IDENTIFIER().GetText();
             var value = Visit(context.expression());
 
-            SharedResources.Variables[varName] = value;
+            scope.Peek()[varName] = value;
 
             return null;
         }
@@ -82,12 +108,16 @@ namespace Amogus.Language
         {
             var varName = context.IDENTIFIER().GetText();
 
-            if(!SharedResources.Variables.ContainsKey(varName))
+            if(SharedResources.Variables.ContainsKey(varName))
             {
-                throw new Exception($"Variable {varName} is not defined.");
+                return SharedResources.Variables[varName];
+            }
+            if(scope.Peek().ContainsKey(varName))
+            {
+                return scope.Peek()[varName];
             }
 
-            return SharedResources.Variables[varName];
+            throw new Exception($"Variable {varName} is not defined.");
         }
 
         public override object? VisitAdditiveExpression(AmogusParser.AdditiveExpressionContext context)
@@ -159,7 +189,7 @@ namespace Amogus.Language
         {
             var name = context.IDENTIFIER().GetText();
             var args = context.variables().GetText().Split(',');
-            SharedResources.Variables[name] = new functionObject(args, context.block());
+            SharedResources.Variables[name] = new functionObject(args, context.block(), name);
 
             return null;
         }
@@ -250,14 +280,17 @@ namespace Amogus.Language
 
     public class functionObject
     {
+        public string name;
         public string[] Names;
         public AmogusParser.BlockContext body;
 
-        public functionObject(string[] names, AmogusParser.BlockContext body){
+        public functionObject(string[] names, AmogusParser.BlockContext body, string name){
             Names = new string[names.Length];
             names.CopyTo(Names, 0);
 
             this.body = body;
+
+            this.name = name;
         }
     }
 }

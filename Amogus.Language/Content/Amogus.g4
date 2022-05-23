@@ -2,11 +2,11 @@
 
 program: line* EOF;
 
-line: functionBlock | statement | ifBlock | whileBlock | EXIT;
+line: functionBlock | statement | ifBlock | whileBlock;
 
-EXIT: 'EXIT;' | 'RETURN;';
+statement: (assignment|functionCall|return) ';';
 
-statement: (assignment|functionCall) ';';
+return: 'RETURN';
 
 ifBlock: IF expression block ('else' elseIfBlock)?;
 

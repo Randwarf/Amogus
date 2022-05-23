@@ -2,13 +2,28 @@
 
 fib(a,b)=>
 {
-	d=a+b;
-	if d>100
+	c=a+b;
+	if c>100
 	{
-		EXIT;
+		RETURN;
 	}
-	Print(d);
-	fib(b,d);
+	Print(c);
+	fib(b,c);
+}
+
+kitoksC(a)=>
+{
+	c=10;
+	Print('kitoks c:', c);
+}
+
+if 1>10
+{
+	Print('klaida');
+}
+else if 10>1
+{
+	Print('aaa');
 }
 
 a=1;
@@ -22,4 +37,7 @@ while c<100
 	c=a+b;
 }
 
-fib(1,1);
+Print('C:', c);
+kitoksC(6);
+Print('C:', c);
+

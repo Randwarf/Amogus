@@ -26,7 +26,7 @@ functionBlock: IDENTIFIER'(' variables ')' '=>' block;
 
 variables: ' '*|(IDENTIFIER (',' IDENTIFIER)*);
 
-functionCall: IDENTIFIER '(' (expression (',' expression)*) ')';
+functionCall: IDENTIFIER '(' (expression (',' expression)*) ')' | IDENTIFIER '(' ' '* ')';
 
 expression
 	: constant							#constantExpression

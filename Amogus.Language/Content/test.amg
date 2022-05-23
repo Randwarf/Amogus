@@ -61,6 +61,5 @@ d=grazinantis;
 c=d(6);
 Print(c);
 
-d=beParametru();
-Print(d);
+Print(beParametru());
 

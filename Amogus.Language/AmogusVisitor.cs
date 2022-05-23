@@ -333,9 +333,9 @@ namespace Amogus.Language
         {
             foreach (var arg in args)
             {
-                var output = (string)(arg ?? string.Empty);
+                var output = (arg ?? string.Empty);
 
-                LogResource.SystemOut.Add(output);
+                LogResource.SystemOut.Add(output.ToString());
 
                 Console.Write(arg);
             }
